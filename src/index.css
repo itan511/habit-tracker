@@ -1,0 +1,13 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --card: #0b0f1a;
+  --muted: #93a3b8;
+}
+
+.card {
+  @apply bg-[var(--card)] rounded-2xl border border-white/5 shadow-soft;
+}
