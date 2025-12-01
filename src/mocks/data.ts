@@ -12,12 +12,30 @@ const history = (len:number) => Array.from({length: len}).map((_,i) => ({
   done: Math.random() > 0.3
 }))
 
-export const habits: Habit[] = [
+const defaultHabits: Habit[] = [
   { id: 12, name: 'Утренний бег', description: '3 км', stats: { streak: 8, completion_rate: 83 }, history: history(30) },
   { id: 13, name: 'Английский 20 мин', stats: { streak: 3, completion_rate: 72 }, history: history(30) },
   { id: 14, name: 'Чтение 15 мин', stats: { streak: 12, completion_rate: 90 }, history: history(30) },
   { id: 15, name: 'Отжимания', stats: { streak: 1, completion_rate: 55 }, history: history(30) }
 ]
+
+function loadHabits(): Habit[] {
+  try {
+    const raw = localStorage.getItem('habits')
+    if (raw) {
+      return JSON.parse(raw)
+    }
+  } catch {}
+  return defaultHabits
+}
+
+export let habits: Habit[] = loadHabits()
+
+export function saveHabits() {
+  try {
+    localStorage.setItem('habits', JSON.stringify(habits))
+  } catch {}
+}
 
 export const friends: User[] = [
   { id: 2, username: 'maxon', name: 'Максон' },

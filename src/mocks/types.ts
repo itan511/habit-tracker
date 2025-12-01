@@ -6,6 +6,7 @@ export type Habit = {
   description?: string
   stats: { streak: number; completion_rate: number }
   history: HistoryPoint[]
+  competitionId?: number
 }
 export type User = {
   id: number

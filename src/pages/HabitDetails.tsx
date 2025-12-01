@@ -36,26 +36,28 @@ export default function HabitDetails(){
       </div>
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="card p-4 lg:col-span-2">
-          <div className="text-sm text-[var(--muted)] mb-2">История</div>
+          <div className="text-sm text-[var(--text-muted)] mb-2">История</div>
           <div className="grid grid-cols-7 gap-2">
             {habit?.history.slice(-28).map(h => (
-              <div key={h.date} className={'h-8 rounded-lg ' + (h.done ? 'bg-green-500/70' : 'bg-white/10')} title={h.date} />
+              <div key={h.date} className={'h-8 rounded-lg ' + (h.done ? 'bg-green-500/70' : 'bg-white/10 dark:bg-white/10')} title={h.date} />
             ))}
           </div>
         </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--muted)]">Комментарии</div>
+        <div className="card p-4 flex flex-col">
+          <div className="text-sm text-[var(--text-muted)]">Комментарии</div>
           <div className="space-y-2 mt-2 max-h-60 overflow-auto pr-1">
             {comments.map(c => (
-              <div key={c.id} className="bg-white/5 rounded-xl p-2">
-                <div className="text-xs text-white/50">{new Date(c.created_at).toLocaleString()}</div>
+              <div key={c.id} className="bg-[var(--card-accent)] rounded-xl p-2">
+                <div className="text-xs text-[var(--text-muted)]">{new Date(c.created_at).toLocaleString()}</div>
                 <div>{c.text}</div>
               </div>
             ))}
           </div>
-          <div className="mt-3 flex gap-2">
-            <input value={text} onChange={e=>setText(e.target.value)} placeholder="Оставьте комментарий" className="flex-1 bg-white/5 px-3 py-2 rounded-xl outline-none"/>
-            <button onClick={send} className="bg-brand hover:bg-brand-dark px-4 py-2 rounded-xl">Отправить</button>
+          <div className="mt-3 flex gap-2 flex-wrap">
+            <input value={text} onChange={e=>setText(e.target.value)} placeholder="Оставьте комментарий" className="flex-1 bg-[var(--card-accent)] px-3 py-2 rounded-xl outline-none"/>
+            <button onClick={send} className="bg-[var(--brand)] hover:bg-[var(--brand-accent)] px-4 py-2 rounded-xl text-white">
+              Отправить
+            </button>
           </div>
         </div>
       </div>

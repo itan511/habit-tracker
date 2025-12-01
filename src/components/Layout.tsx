@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   LogOut,
 } from "lucide-react";
+import ThemeToggle from './ThemeToggle'
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -14,18 +15,21 @@ export default function Layout() {
 
   const base =
     "flex items-center gap-3 px-4 py-2 rounded-2xl text-sm font-medium transition-colors";
-  const inactive = "text-slate-300 hover:bg-slate-800/80";
-  const active = "bg-slate-800 text-slate-50";
+  const inactive = "text-[var(--text-muted)] hover:bg-[var(--card-accent)]";
+  const active = "bg-[var(--brand-accent)] text-[var(--text)]";
 
   return (
-    <div className="min-h-screen flex bg-slate-950 text-slate-50">
+  <div className="min-h-screen flex app-accent text-[var(--text)]">
       {/* ЛЕВАЯ ПАНЕЛЬ */}
-      <aside className="w-64 flex-shrink-0 border-r border-slate-800 bg-slate-950/95 backdrop-blur-lg flex flex-col">
-        <div className="px-6 py-6 text-xl font-semibold tracking-tight">
-          Habit Tracker
+  <aside className="w-64 flex-shrink-0 border-r bg-[var(--card)] flex flex-col" style={{ borderColor: 'var(--card-accent)' }}>
+        <div className="px-6 py-6 text-xl font-semibold tracking-tight flex items-center justify-between">
+          <div>Habit Tracker</div>
+          <div className="flex items-center">
+            <ThemeToggle />
+          </div>
         </div>
 
-        <nav className="px-3 space-y-1 flex-1">
+  <nav className="px-3 space-y-1 flex-1">
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
@@ -56,8 +60,18 @@ export default function Layout() {
             <span>Друзья</span>
           </NavLink>
 
+          <NavLink
+            to="/competitions"
+            className={({ isActive }) =>
+              `${base} ${isActive ? active : inactive}`
+            }
+          >
+            <span className="w-4 h-4 text-lg">🏆</span>
+            <span>Соревнования</span>
+          </NavLink>
+
           <button
-            className="mt-4 w-full flex items-center justify-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold py-2"
+            className="mt-4 w-full flex items-center justify-center gap-2 rounded-2xl bg-[var(--brand)] hover:opacity-90 text-sm font-semibold py-2"
             onClick={() => navigate("/habit/new")}
           >
             <PlusCircle className="w-4 h-4" />

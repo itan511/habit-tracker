@@ -24,12 +24,12 @@ export default function NewHabit() {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 rounded-3xl bg-slate-900/80 border border-slate-800 p-4 sm:p-6"
+        className="space-y-4 rounded-3xl bg-[var(--card)] border border-[var(--card-accent)] p-4 sm:p-6"
       >
         <div className="space-y-1">
-          <label className="text-sm text-slate-300">Название</label>
+          <label className="text-sm text-[var(--text-muted)]">Название</label>
           <input
-            className="w-full rounded-2xl bg-slate-950/80 border border-slate-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-2xl bg-[var(--card-accent)] border border-[var(--card-accent)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--brand)]"
             placeholder="Например, Утренний бег"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -37,9 +37,9 @@ export default function NewHabit() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm text-slate-300">Описание</label>
+          <label className="text-sm text-[var(--text-muted)]">Описание</label>
           <textarea
-            className="w-full rounded-2xl bg-slate-950/80 border border-slate-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-none h-24"
+            className="w-full rounded-2xl bg-[var(--card-accent)] border border-[var(--card-accent)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--brand)] resize-none h-24"
             placeholder="Коротко, что именно ты делаешь"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -47,9 +47,9 @@ export default function NewHabit() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm text-slate-300">Периодичность</label>
+          <label className="text-sm text-[var(--text-muted)]">Периодичность</label>
           <select
-            className="w-full rounded-2xl bg-slate-950/80 border border-slate-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-2xl bg-[var(--card-accent)] border border-[var(--card-accent)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--brand)]"
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
           >
@@ -63,13 +63,13 @@ export default function NewHabit() {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-4 py-2 rounded-2xl border border-slate-700 text-sm text-slate-200 hover:bg-slate-800/70"
+            className="px-4 py-2 rounded-2xl border border-[var(--card-accent)] text-sm text-[var(--text-muted)] hover:bg-[var(--card-accent)]"
           >
             Отмена
           </button>
           <button
             type="submit"
-            className="px-4 py-2 rounded-2xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold"
+            className="px-4 py-2 rounded-2xl bg-[var(--brand)] hover:bg-[var(--brand-accent)] text-sm font-semibold text-white"
           >
             Создать
           </button>

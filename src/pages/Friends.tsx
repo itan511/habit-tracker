@@ -55,14 +55,14 @@ export default function Friends() {
         {friends.map((f) => (
           <div
             key={f.id}
-            className="rounded-3xl bg-slate-900/80 border border-slate-800 px-4 py-3"
+            className="rounded-3xl bg-[var(--card)] border border-[var(--card-accent)] px-4 py-3"
           >
-            <div className="font-semibold">{f.name}</div>
-            <div className="text-sm text-slate-400">@{f.username}</div>
+            <div className="font-semibold text-[var(--text)]">{f.name}</div>
+            <div className="text-sm text-[var(--text-muted)]">@{f.username}</div>
           </div>
         ))}
         {friends.length === 0 && (
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-[var(--text-muted)]">
             Пока нет друзей. Добавьте кого-нибудь по @тегу.
           </p>
         )}

@@ -1,5 +1,5 @@
 
-import { habits, me, friends, comments } from './data'
+import { habits, me, friends, comments, saveHabits } from './data'
 import { Habit, User, Comment } from './types'
 
 const wait = (ms:number) => new Promise(r => setTimeout(r, ms))
@@ -62,5 +62,29 @@ export const api = {
     return c
   },
   async getFriends(): Promise<User[]> { await wait(200); return friends },
-  async addFriend(tag:string): Promise<User> { await wait(200); return { id: Date.now(), username: tag, name: tag } }
+  async addFriend(tag:string): Promise<User> { await wait(200); return { id: Date.now(), username: tag, name: tag } },
+  async deleteHabit(id:number){
+    await wait(100)
+    const idx = habits.findIndex(h=>h.id===id)
+    if(idx>-1) {
+      habits.splice(idx,1)
+      saveHabits()
+    }
+    return true
+  },
+  async createCompetitionHabit(habitName: string, description: string | undefined, competitionId: number): Promise<Habit> {
+    await wait(150)
+    const id = Date.now()
+    const h: Habit = {
+      id,
+      name: habitName,
+      description,
+      stats: { streak: 0, completion_rate: 0 },
+      history: [],
+      competitionId
+    }
+    habits.push(h)
+    saveHabits()
+    return h
+  },
 }

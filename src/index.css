@@ -4,10 +4,47 @@
 @tailwind utilities;
 
 :root {
-  --card: #0b0f1a;
-  --muted: #93a3b8;
+  /* light theme variables */
+  --bg: #f8fafc;
+  --bg-accent: #f3f4fa;
+  --card: #fff;
+  --card-accent: #ede9fe;
+  --text: #23213a;
+  --text-muted: #6b7280;
+  --brand: #7c3aed;
+  --brand-accent: #a78bfa;
+  --danger: #ef4444;
+}
+
+/* dark theme overrides (applied when .dark is on the <html> element) */
+html.dark {
+  --bg: #181826;
+  --bg-accent: #181826;
+  --card: #23213a;
+  --card-accent: #372579;
+  --text: #e6eef8;
+  --text-muted: #93a3b8;
+  --brand: #a78bfa;
+  --brand-accent: #7c3aed;
+  --danger: #f87171;
 }
 
 .card {
-  @apply bg-[var(--card)] rounded-2xl border border-white/5 shadow-soft;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -10px rgba(0,0,0,0.08);
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid #ececec;
+  transition: transform .12s, box-shadow .12s, background-color .12s, border-color .12s;
+}
+
+/* page bg */
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* make the top-level accent visible behind the content */
+.app-accent {
+  background: var(--bg-accent);
 }
