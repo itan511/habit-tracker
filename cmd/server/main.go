@@ -12,10 +12,10 @@ import (
 	"time"
 
 	"habit-tracker/internal/api/handlers"
+	"habit-tracker/internal/api/middleware"
 	"habit-tracker/internal/repository"
 	"habit-tracker/internal/services"
-
-	// middleware
+	"habit-tracker/internal/utils"
 
 	_ "github.com/lib/pq"
 )
@@ -29,7 +29,6 @@ func main() {
 	jwtSecret := mustGetEnv("JWT_SECRET")
 	serverPort := getEnv("SERVER_PORT", "8080")
 
-	//Подключение к базе
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPassword, dbName)
 
@@ -47,20 +46,41 @@ func main() {
 	}
 	log.Println("Успешное подключение к базе данных.")
 
+	// Инициализация репозиториев
 	userRepo := repository.NewUserRepo(db)
 	log.Println("Репозиторий пользователей инициализирован.")
 
+	// Инициализация JWT менеджера и middleware
+	jwtManager := utils.NewJWTManager([]byte(jwtSecret), time.Hour*24)
+	authMiddleware := middleware.NewAuthMiddleware(jwtManager)
+
+	// Инициализация сервисов
 	userService := services.NewUserService(userRepo, []byte(jwtSecret))
 	log.Println("Сервис пользователей инициализирован.")
 
+	// Инициализация обработчиков пользователей
 	userHandler := handlers.NewUserHandler(userService)
-	log.Println("HTTP-обработчики инициализирован.")
+	log.Println("HTTP-обработчики пользователей инициализированы.")
 
+	// Инициализация сервиса друзей
+	friendRepo := repository.NewFriendRepo(db)
+	friendService := services.NewFriendService(friendRepo)
+	friendHandler := handlers.NewFriendHandler(friendService, userRepo)
+	log.Println("Сервис друзей инициализирован.")
+
+	// Создаем роутер
 	mux := http.NewServeMux()
 
+	// Публичные эндпоинты
 	mux.HandleFunc("POST /api/register", userHandler.RegisterHandler)
 	mux.HandleFunc("POST /api/login", userHandler.LoginHandler)
 
+	// Защищенные эндпоинты (требуют JWT)
+	mux.Handle("POST /api/friends", authMiddleware(http.HandlerFunc(friendHandler.AddFriendHandler)))
+	mux.Handle("GET /api/friends", authMiddleware(http.HandlerFunc(friendHandler.GetFriendsHandler)))
+	mux.Handle("DELETE /api/friends/{id}", authMiddleware(http.HandlerFunc(friendHandler.RemoveFriendHandler)))
+
+	// Health check
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(w, `{"status":"ok","service":"habit-tracker"}`)
@@ -100,9 +120,14 @@ func main() {
 
 	log.Printf("Сервер запускается на порту %s...", serverPort)
 	log.Println("Доступные публичные эндпоинты:")
-	log.Println("  POST /api/register - регистрация нового пользователя")
-	log.Println("  POST /api/login    - аутентификация пользователя")
-	log.Println("  GET  /health       - проверка здоровья сервиса")
+	log.Println("  POST /api/register    - регистрация нового пользователя")
+	log.Println("  POST /api/login       - аутентификация пользователя")
+	log.Println("  GET  /health          - проверка здоровья сервиса")
+	log.Println("")
+	log.Println("Защищенные эндпоинты (требуют Bearer токен):")
+	log.Println("  POST   /api/friends           - добавить друга")
+	log.Println("  GET    /api/friends           - получить список друзей")
+	log.Println("  DELETE /api/friends/{id}      - удалить друга")
 	log.Println("==========================================")
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
