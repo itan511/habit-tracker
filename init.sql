@@ -5,3 +5,16 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS habits (
+    id SERIAL PRIMARY KEY,
+    user_id INT,
+    name TEXT,
+    description TEXT
+)
+
+CREATE TABLE IF NOT EXISTS habit_history (
+    habit_id INT,
+    date DATE,
+    done BOOLEAN
+)
