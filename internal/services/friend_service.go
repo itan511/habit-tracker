@@ -30,3 +30,17 @@ func (s *friendService) GetFriends(ctx context.Context, userID int) ([]int, erro
 func (s *friendService) RemoveFriend(ctx context.Context, userID, friendID int) error {
 	return s.repo.RemoveFriend(ctx, userID, friendID)
 }
+
+func (s *friendService) IsFriend(ctx context.Context, userID, otherID int) (bool, error) {
+	friends, err := s.repo.GetFriends(ctx, userID)
+	if err != nil {
+		return false, err
+	}
+
+	for _, f := range friends {
+		if f == otherID {
+			return true, nil
+		}
+	}
+	return false, nil
+}
