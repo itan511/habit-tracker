@@ -5,9 +5,9 @@ import { Habit, User, Comment } from './types'
 const wait = (ms:number) => new Promise(r => setTimeout(r, ms))
 
 const mockUsers = [
-  { username: "artur", password: "12345", id: 1, name: "Артур" },
-  { username: "nastya", password: "0000", id: 2, name: "Настя" },
-  { username: "demo", password: "demo", id: 3, name: "Demo User" }
+  { username: "artur", password: "12345", id: 1, email: "artur@example.com", name: "Артур" },
+  { username: "nastya", password: "0000", id: 2, email: "nastya@example.com", name: "Настя" },
+  { username: "demo", password: "demo", id: 3, email: "demo@example.com", name: "Demo User" }
 ];
 
 export const api = {
@@ -28,7 +28,7 @@ export const api = {
     };
   },
 
-  async register(payload: {username:string; password:string; name:string}){
+  async register(payload: {username:string; password:string; name:string; email: string}){
     await wait(300)
     return { id: 99, ...payload }
   },
@@ -63,6 +63,12 @@ export const api = {
   },
   async getFriends(): Promise<User[]> { await wait(200); return friends },
   async addFriend(tag:string): Promise<User> { await wait(200); return { id: Date.now(), username: tag, name: tag } },
+  async getUserHabits(userId: number): Promise<Habit[]> {
+    await wait(200);
+    // В реальной реализации здесь будет запрос к серверу для получения привычек конкретного пользователя
+    // Пока возвращаем те же привычки, что и у текущего пользователя, но с возможностью различать их по userId
+    return habits;
+  },
   async deleteHabit(id:number){
     await wait(100)
     const idx = habits.findIndex(h=>h.id===id)

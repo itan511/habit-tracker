@@ -11,6 +11,7 @@ export type Habit = {
 export type User = {
   id: number
   username: string
+  email: string
   name: string
   avatar?: string
   bio?: string

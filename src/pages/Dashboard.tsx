@@ -28,7 +28,7 @@ export default function Dashboard(){
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {regularHabits.map(h => (
           <div key={h.id} className="space-y-2">
-            <HabitCard habit={h}/>
+            <HabitCard habit={h} showToggleBtn={false}/>
             <button onClick={()=>toggleToday(h.id)} className="w-full bg-white/10 hover:bg-white/20 rounded-xl py-2">
               Переключить «сегодня»
             </button>
@@ -41,7 +41,7 @@ export default function Dashboard(){
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {competitionHabits.map(h => (
               <div key={h.id} className="space-y-2">
-                <HabitCard habit={h}/>
+                <HabitCard habit={h} showToggleBtn={false}/>
                 <button onClick={()=>toggleToday(h.id)} className="w-full bg-white/10 hover:bg-white/20 rounded-xl py-2">
                   Переключить «сегодня»
                 </button>
