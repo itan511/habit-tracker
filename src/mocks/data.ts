@@ -5,7 +5,7 @@ import { format, subDays } from 'date-fns'
 const today = new Date()
 const days = (n:number) => format(subDays(today, n), 'yyyy-MM-dd')
 
-export const me: User = { id: 1, username: 'saribekyan', name: 'Сарибекян А.К.', tags: ['frontend','goals'] }
+export const me: User = { id: 1, username: 'saribekyan', email: 'saribekyan@example.com' }
 
 const history = (len:number) => Array.from({length: len}).map((_,i) => ({
   date: days(len-i-1),
@@ -38,9 +38,9 @@ export function saveHabits() {
 }
 
 export const friends: User[] = [
-  { id: 2, username: 'maxon', name: 'Максон' },
-  { id: 3, username: 'lev', name: 'Лёва' },
-  { id: 4, username: 'nastya', name: 'Настя' }
+  { id: 2, username: 'maxon', email: 'maxon@example.com' },
+  { id: 3, username: 'lev', email: 'lev@example.com' },
+  { id: 4, username: 'nastya', email: 'nastya@example.com' }
 ]
 
 export const comments: Record<number, Comment[]> = {

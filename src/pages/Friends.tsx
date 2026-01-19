@@ -86,7 +86,7 @@ export default function Friends() {
                 }`}
                 onClick={() => loadFriendHabits(f.id)}
               >
-                <div className="font-semibold text-[var(--text)]">{f.name}</div>
+                <div className="font-semibold text-[var(--text)]">{f.username}</div>
                 <div className="text-sm text-[var(--text-muted)]">@{f.username}</div>
               </div>
             ))}
@@ -103,7 +103,7 @@ export default function Friends() {
           {selectedFriend ? (
             <div className="space-y-4">
               <div className="card p-4">
-                <h2 className="text-xl font-semibold">Привычки {selectedFriend.name}</h2>
+                <h2 className="text-xl font-semibold">Привычки {selectedFriend.username}</h2>
                 <p className="text-[var(--text-muted)]">@{selectedFriend.username}</p>
               </div>
 

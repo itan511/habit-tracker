@@ -41,7 +41,7 @@ export default function Competitions(){
                 <input type="checkbox" checked={selected.includes(f.id)} onChange={(e)=>{
                   setSelected(s => e.target.checked ? [...s, f.id] : s.filter(x=>x!==f.id))
                 }} />
-                <div>{f.name}</div>
+                <div>{f.username}</div>
               </label>
             ))}
           </div>
@@ -67,7 +67,7 @@ export default function Competitions(){
               <div className="mt-3 text-sm text-[var(--muted)]">Участники:</div>
               <div className="mt-2 flex gap-2 flex-wrap">
                 {c.members.map(m=> (
-                  <div key={m.id} className="px-2 py-1 bg-white/5 rounded-lg">{m.name}</div>
+                  <div key={m.id} className="px-2 py-1 bg-white/5 rounded-lg">{m.username}</div>
                 ))}
               </div>
             </Link>

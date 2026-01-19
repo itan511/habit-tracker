@@ -8,13 +8,13 @@ export default function CompetitionDetails() {
   const { id } = useParams()
   const compId = Number(id)
   const { competitions, fetch } = useCompetitionStore()
-  const [habit, setHabit] = useState<any>(null)
+  const [habits, setHabits] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch()
     api.getHabits().then(habits => {
-      setHabit(habits.find(h => h.competitionId === compId))
+      setHabits(habits.filter(h => h.competitionId === compId))
       setLoading(false)
     })
   }, [compId])
@@ -29,34 +29,38 @@ export default function CompetitionDetails() {
         <h1 className="text-2xl font-bold">{comp.name}</h1>
       </div>
       <div className="text-[var(--muted)]">{comp.description}</div>
-      <div className="mt-2 text-sm">Создатель: <span className="font-semibold">{comp.owner.name}</span></div>
+      <div className="mt-2 text-sm">Создатель: <span className="font-semibold">{comp.owner.username}</span></div>
       <div className="mt-4">
         <div className="font-semibold mb-2">Участники:</div>
         <div className="flex gap-2 flex-wrap">
           {comp.members.map(m => (
-            <div key={m.id} className="px-3 py-1 rounded-lg bg-white/5 text-sm">{m.name}</div>
+            <div key={m.id} className="px-3 py-1 rounded-lg bg-white/5 text-sm">{m.username}</div>
           ))}
         </div>
       </div>
       <div className="mt-6">
-        <div className="font-semibold mb-2">Привычка соревнования:</div>
-        {loading ? <div>Загрузка...</div> : habit ? (
-          <div className="card p-4 flex items-center gap-6">
-            <div>
-              <div className="text-lg font-semibold">{habit.name}</div>
-              <div className="text-sm text-[var(--muted)]">{habit.description}</div>
-            </div>
-            <ProgressRing progress={habit.stats.completion_rate} />
+        <div className="font-semibold mb-2">Привычки соревнования:</div>
+        {loading ? <div>Загрузка...</div> : habits.length > 0 ? (
+          <div className="space-y-4">
+            {habits.map(habit => (
+              <div key={habit.id} className="card p-4 flex items-center gap-6">
+                <div>
+                  <div className="text-lg font-semibold">{habit.name}</div>
+                  <div className="text-sm text-[var(--muted)]">{habit.description}</div>
+                </div>
+                <ProgressRing progress={habit.stats.completion_rate} />
+              </div>
+            ))}
           </div>
-        ) : <div className="text-[var(--muted)]">Нет привычки для этого соревнования</div>}
+        ) : <div className="text-[var(--muted)]">Нет привычек для этого соревнования</div>}
       </div>
       <div className="mt-6">
-        <div className="font-semibold mb-2">Прогресс участников (мок):</div>
+        <div className="font-semibold mb-2">Прогресс участников:</div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {comp.members.map(m => (
             <div key={m.id} className="card p-4 flex items-center gap-4">
-              <div className="font-semibold">{m.name}</div>
-              <ProgressRing progress={habit ? habit.stats.completion_rate - Math.floor(Math.random()*20) : 0} />
+              <div className="font-semibold">{m.username}</div>
+              <ProgressRing progress={habits.length > 0 ? Math.max(0, habits[0].stats.completion_rate - Math.floor(Math.random()*20)) : 0} />
             </div>
           ))}
         </div>
