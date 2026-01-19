@@ -1,0 +1,21 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build output
+*.test
+*.out
+
+# Vendor directory
+/vendor/
+
+# IDE/editor
+.vscode/
+.idea/
+*.iml
+
+# macOS
+.DS_Store

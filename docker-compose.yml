@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+
+  app:
+    build: .
+    container_name: habit-tracker-app
+    ports:
+      - "8080:8080" 
+    depends_on:
+      - db 
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=secretpassword
+      - DB_NAME=habit_tracker
+      - JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
+    restart: unless-stopped
+    # volumes:
+    #   - ./logs:/app/logs # Раскомментируйте, если нужно логировать в файл
+
+  db:
+    image: postgres:15-alpine
+    container_name: habit-tracker-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: habit_tracker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432" 
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
