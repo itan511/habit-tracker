@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"habit-tracker/internal/models"
 	"habit-tracker/internal/repository"
 	"time"
@@ -85,29 +84,4 @@ func (s *habitService) History(ctx context.Context, habitID int) ([]models.Histo
 	return history, nil
 }
 
-func (s *habitService) AddComment(ctx context.Context, habitID, userID int, text string) error {
-	row, err := s.repo.GetByID(ctx, habitID)
-	if err != nil {
-		return err
-	}
-	var h models.Habit
-	if err := row.Scan(&h.ID, &h.Name, &h.Description); err != nil {
-		return nil
-	}
 
-	// владелец может всегда
-	if h.UserID != userID {
-		// проверяем через friend_service
-		isFriend, err := s.friendService.IsFriend(ctx, h.UserID, userID)
-		if err != nil || !isFriend {
-			return errors.New("no access")
-		}
-	}
-
-	// сохраняем комментарий прямо в habit_repo
-	return s.repo.AddComment(ctx, &models.Comment{
-		HabitID: habitID,
-		UserID:  userID,
-		Text:    text,
-	})
-}
