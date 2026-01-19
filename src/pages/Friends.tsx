@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/mocks/api";
 import type { User, Habit } from "@/mocks/types";
 import HabitCard from "@/components/HabitCard";
+import { Link } from 'react-router-dom';
 
 export default function Friends() {
   const [friends, setFriends] = useState<User[]>([]);
@@ -77,18 +78,18 @@ export default function Friends() {
           <h2 className="text-lg font-semibold mb-3">Ваши друзья</h2>
           <div className="space-y-3">
             {friends.map((f) => (
-              <div
+              <Link
                 key={f.id}
-                className={`rounded-3xl bg-[var(--card)] border border-[var(--card-accent)] px-4 py-3 cursor-pointer transition-all ${
+                to={`/friend/${f.id}`}
+                className={`rounded-3xl bg-[var(--card)] border border-[var(--card-accent)] px-4 py-3 block cursor-pointer transition-all ${
                   selectedFriendId === f.id
                     ? 'ring-2 ring-blue-500/50'
                     : 'hover:bg-[var(--card-hover)]'
                 }`}
-                onClick={() => loadFriendHabits(f.id)}
               >
                 <div className="font-semibold text-[var(--text)]">{f.username}</div>
                 <div className="text-sm text-[var(--text-muted)]">@{f.username}</div>
-              </div>
+              </Link>
             ))}
             {friends.length === 0 && (
               <p className="text-sm text-[var(--text-muted)]">

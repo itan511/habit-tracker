@@ -78,15 +78,11 @@ export const api = {
   },
 
   async getHabitStats(id: number) {
-    // Используем тот же эндпоинт, что и для истории, но возвращаем только статистику
-    const response = await apiClient.get(`/habits/${id}/history`);
-    const history = response.data;
+    // Получаем статистику из эндпоинта привычки
+    const response = await apiClient.get(`/habits/${id}`);
+    const habit = response.data;
 
-    // Вычисляем статистику из истории
-    const streak = calculateStreak(history);
-    const completionRate = calculateCompletionRate(history);
-
-    return { streak, completion_rate: completionRate };
+    return habit.stats;
   },
 
   async getHabitHistory(habitId: number) {
@@ -132,74 +128,5 @@ export const api = {
     return response.data;
   },
 
-  async createCompetitionHabit(habitName: string, description: string | undefined, competitionId: number): Promise<Habit> {
-    // Для соревновательных привычек пока используем тот же эндпоинт
-    const response = await apiClient.post('/habits', {
-      name: habitName,
-      description,
-      competition_id: competitionId
-    });
-    return response.data;
-  },
 };
 
-// Вспомогательные функции для вычисления статистики
-function calculateStreak(history: { date: string; done: boolean }[]): number {
-  if (!history || history.length === 0) return 0;
-
-  // Сортируем по дате в порядке убывания (сначала самые новые)
-  const sortedHistory = [...history].sort((a, b) =>
-    new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-
-  let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // Проверяем, выполнялось ли задание сегодня
-  const todayStr = formatDate(today);
-  const todayEntry = sortedHistory.find(entry => entry.date === todayStr);
-
-  // Если сегодня не было выполнения, прерываем серию
-  if (todayEntry && !todayEntry.done) {
-    return 0;
-  }
-
-  // Подсчитываем серию, начиная с сегодняшнего дня
-  for (let i = 0; i < sortedHistory.length; i++) {
-    const entry = sortedHistory[i];
-    const entryDate = new Date(entry.date);
-    entryDate.setHours(0, 0, 0, 0);
-
-    // Проверяем, является ли это "вчера", "позавчера" и т.д.
-    const daysDiff = Math.floor((today.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (daysDiff !== i) {
-      // Пропущен день, прерываем подсчет
-      break;
-    }
-
-    if (entry.done) {
-      streak++;
-    } else {
-      // Если встречаем день без выполнения, прерываем серию
-      break;
-    }
-  }
-
-  return streak;
-}
-
-function calculateCompletionRate(history: { date: string; done: boolean }[]): number {
-  if (!history || history.length === 0) return 0;
-
-  const completedCount = history.filter(entry => entry.done).length;
-  return Math.round((completedCount / history.length) * 100);
-}
-
-function formatDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
