@@ -60,15 +60,6 @@ export default function Layout() {
             <span>Друзья</span>
           </NavLink>
 
-          <NavLink
-            to="/competitions"
-            className={({ isActive }) =>
-              `${base} ${isActive ? active : inactive}`
-            }
-          >
-            <span className="w-4 h-4 text-lg">🏆</span>
-            <span>Соревнования</span>
-          </NavLink>
 
           <button
             className="mt-4 w-full flex items-center justify-center gap-2 rounded-2xl bg-[var(--brand)] hover:opacity-90 text-sm font-semibold py-2"

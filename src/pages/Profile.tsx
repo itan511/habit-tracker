@@ -12,7 +12,7 @@ export default function Profile(){
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Профиль</h1>
       <div className="card p-6">
-        <div className="text-xl">{user?.name}</div>
+        <div className="text-xl">{user?.username}</div>
         <div className="text-[var(--muted)]">@{user?.username}</div>
       </div>
     </div>
