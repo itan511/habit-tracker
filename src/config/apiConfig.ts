@@ -2,7 +2,9 @@
 
 export const API_CONFIG = {
   // Базовый URL вашего Go-сервера
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  // In Docker environment, the backend is accessible at /api which is proxied to backend:8080
+  // In development, it defaults to localhost:8080/api
+  BASE_URL: import.meta.env.VITE_API_URL || '/api',
 
   // Таймаут для запросов (в миллисекундах)
   TIMEOUT: 10000,

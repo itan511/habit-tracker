@@ -40,14 +40,14 @@ func (r *postgresHabitRepo) Delete(ctx context.Context, habitID int) error {
 
 func (r *postgresHabitRepo) GetAll(ctx context.Context, userID int) (*sql.Rows, error) {
 	return r.db.QueryContext(ctx,
-		`SELECT id, name, description FROM habits WHERE user_id=$1`,
+		`SELECT id, name, description, user_id FROM habits WHERE user_id=$1`,
 		userID,
 	)
 }
 
 func (r *postgresHabitRepo) GetByID(ctx context.Context, habitID int) (*sql.Row, error) {
 	return r.db.QueryRowContext(ctx,
-		`SELECT id, name, description FROM habits WHERE id=$1`,
+		`SELECT id, name, description, user_id FROM habits WHERE id=$1`,
 		habitID,
 	), nil
 }

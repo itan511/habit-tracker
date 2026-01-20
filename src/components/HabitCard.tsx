@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom'
-import { Habit } from '@/mocks/types'
+import { Habit } from '@/services/habitsApi'
 import ProgressRing from './ProgressRing'
 import { format } from 'date-fns'
 
@@ -14,12 +14,16 @@ function pickIcon(name: string){
 }
 
 export default function HabitCard({habit, showToggleBtn = true}: {habit: Habit, showToggleBtn?: boolean}){
+  // Проверяем, что все необходимые свойства существуют
+  const history = habit.history || [];
+  const stats = habit.stats || { streak: 0, completion_rate: 0 };
+
   const today = format(new Date(), 'yyyy-MM-dd')
-  const todayMark = habit.history.find(h => h.date === today)?.done ?? false
+  const todayMark = history.find(h => h.date === today)?.done ?? false
   const statusColor = todayMark
     ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
     : 'bg-blue-100 text-blue-700 dark:bg-sky-500/20 dark:text-sky-300'
-  const icon = pickIcon(habit.name)
+  const icon = pickIcon(habit.name || '')
   return (
     <div>
       <Link to={`/habit/${habit.id}`} className={`card p-4 block hover:shadow-lg hover:-translate-y-1 transition`}>
@@ -31,11 +35,11 @@ export default function HabitCard({habit, showToggleBtn = true}: {habit: Habit, 
               <div className="text-sm text-[var(--text-muted)]">{habit.description}</div>
             </div>
           </div>
-          <ProgressRing progress={habit.stats.completion_rate}/>
+          <ProgressRing progress={stats.completion_rate}/>
         </div>
         <div className={`mt-3 flex flex-wrap items-center gap-3 text-xs px-2 py-1 rounded-lg ${statusColor}`} style={{minHeight:'24px'}}>
           <span className="font-medium whitespace-nowrap">Сегодня: {todayMark ? 'выполнено' : 'запланировано'}</span>
-          <span className="text-[var(--text-muted)] whitespace-nowrap">Streak: {habit.stats.streak}д</span>
+          <span className="text-[var(--text-muted)] whitespace-nowrap">Streak: {stats.streak}д</span>
         </div>
       </Link>
       {showToggleBtn && (

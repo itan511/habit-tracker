@@ -36,10 +36,10 @@ func (r *friendRepo) AddFriend(ctx context.Context, userID, friendID int) error 
 		return errors.New("user not found")
 	}
 
-	// Проверяем, не друзья ли уже
+	// Проверяем, не добавлен ли уже пользователь как друг (в любом направлении)
 	var alreadyFriends bool
 	err = r.db.QueryRowContext(ctx,
-		"SELECT EXISTS(SELECT 1 FROM friends WHERE user_id = $1 AND friend_id = $2)",
+		"SELECT EXISTS(SELECT 1 FROM friends WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1))",
 		userID, friendID).Scan(&alreadyFriends)
 	if err != nil {
 		return err
@@ -48,11 +48,26 @@ func (r *friendRepo) AddFriend(ctx context.Context, userID, friendID int) error 
 		return errors.New("already friends")
 	}
 
-	// Добавляем друга (взаимная дружба)
-	_, err = r.db.ExecContext(ctx,
-		"INSERT INTO friends (user_id, friend_id) VALUES ($1, $2), ($2, $1)",
-		userID, friendID)
-	return err
+	// Добавляем связь дружбы в обе стороны для симметричного доступа
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// Пользователь A добавляет пользователя B
+	_, err = tx.ExecContext(ctx, "INSERT INTO friends (user_id, friend_id) VALUES ($1, $2)", userID, friendID)
+	if err != nil {
+		return err
+	}
+
+	// Для симметрии добавляем обратную запись: B "имеет" A как друга
+	_, err = tx.ExecContext(ctx, "INSERT INTO friends (user_id, friend_id) VALUES ($1, $2)", friendID, userID)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (r *friendRepo) GetFriends(ctx context.Context, userID int) ([]int, error) {

@@ -1,11 +1,10 @@
 
 import { create } from 'zustand'
-import { api } from '@/mocks/api'
-import type { Habit } from '@/mocks/types'
+import { habitsApi } from '@/services/habitsApi'
 import { format } from 'date-fns'
 
 type State = {
-  habits: Habit[]
+  habits: import('@/services/habitsApi').Habit[]
   loading: boolean
   fetch: ()=>Promise<void>
   toggleToday: (id:number)=>Promise<void>
@@ -16,14 +15,26 @@ export const useHabitStore = create<State>((set,get)=> ({
   loading: false,
   async fetch(){
     set({loading:true})
-    const data = await api.getHabits()
-    set({habits: data, loading:false})
+    try {
+      const data = await habitsApi.getAll()
+      // Убедимся, что data не null и является массивом
+      const habitsData = Array.isArray(data) ? data : []
+      set({habits: habitsData, loading:false})
+    } catch (error) {
+      console.error('Error fetching habits:', error)
+      set({habits: [], loading:false})
+    }
   },
   async toggleToday(id:number){
     const today = format(new Date(), 'yyyy-MM-dd')
-    const h = get().habits.find(h=>h.id===id)
-    const done = !(h?.history.find(x=>x.date===today)?.done ?? false)
-    await api.toggleProgress(id, today, done)
-    await get().fetch()
+    const currentHabits = get().habits || []
+    const h = currentHabits.find(h=>h.id===id)
+    const done = !(h?.history?.find(x=>x.date===today)?.done ?? false)
+    try {
+      await habitsApi.updateProgress(id, today, done)
+      await get().fetch()
+    } catch (error) {
+      console.error('Error updating habit progress:', error)
+    }
   }
 }))

@@ -16,6 +16,7 @@ import (
 type UserService interface {
 	Register(ctx context.Context, creds *models.UserCreds) (*models.UserResponse, error)
 	Login(ctx context.Context, creds *models.UserCreds) (*models.UserResponse, error)
+	GetByEmail(ctx context.Context, email string) (*models.User, error)
 }
 
 type userService struct {
@@ -124,4 +125,8 @@ func (s *userService) Login(ctx context.Context, creds *models.UserCreds) (*mode
 		User:  toPublic(u),
 		Token: token,
 	}, nil
+}
+
+func (s *userService) GetByEmail(ctx context.Context, email string) (*models.User, error) {
+	return s.repo.GetByEmail(ctx, email)
 }

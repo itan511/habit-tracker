@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"habit-tracker/internal/api"
 	"habit-tracker/internal/api/handlers"
 	"habit-tracker/internal/api/middleware"
 	"habit-tracker/internal/repository"
@@ -48,7 +49,9 @@ func main() {
 
 	// Инициализация репозиториев
 	userRepo := repository.NewUserRepo(db)
-	log.Println("Репозиторий пользователей инициализирован.")
+	friendRepo := repository.NewFriendRepo(db)
+	habitRepo := repository.NewHabitRepo(db) // Assuming there's a habit repository
+	log.Println("Репозитории инициализированы.")
 
 	// Инициализация JWT менеджера и middleware
 	jwtManager := utils.NewJWTManager([]byte(jwtSecret), time.Hour*24)
@@ -56,35 +59,20 @@ func main() {
 
 	// Инициализация сервисов
 	userService := services.NewUserService(userRepo, []byte(jwtSecret))
-	log.Println("Сервис пользователей инициализирован.")
-
-	// Инициализация обработчиков пользователей
-	userHandler := handlers.NewUserHandler(userService)
-	log.Println("HTTP-обработчики пользователей инициализированы.")
-
-	// Инициализация сервиса друзей
-	friendRepo := repository.NewFriendRepo(db)
 	friendService := services.NewFriendService(friendRepo)
-	friendHandler := handlers.NewFriendHandler(friendService, userRepo)
-	log.Println("Сервис друзей инициализирован.")
+	habitService := services.NewHabitService(db, habitRepo)
+	log.Println("Сервисы инициализированы.")
 
-	// Создаем роутер
+	// Инициализация обработчиков
+	userHandler := handlers.NewUserHandler(userService)
+	friendHandler := handlers.NewFriendHandler(friendService, userRepo, db)
+	habitHandler := handlers.NewHabitHandler(habitService, userRepo, friendService)
+	log.Println("HTTP-обработчики инициализированы.")
+
+	// Создаем роутер и настраиваем маршруты
+	router := api.NewRouter(userHandler, friendHandler, habitHandler, authMiddleware)
 	mux := http.NewServeMux()
-
-	// Публичные эндпоинты
-	mux.HandleFunc("POST /api/register", userHandler.RegisterHandler)
-	mux.HandleFunc("POST /api/login", userHandler.LoginHandler)
-
-	// Защищенные эндпоинты (требуют JWT)
-	mux.Handle("POST /api/friends", authMiddleware(http.HandlerFunc(friendHandler.AddFriendHandler)))
-	mux.Handle("GET /api/friends", authMiddleware(http.HandlerFunc(friendHandler.GetFriendsHandler)))
-	mux.Handle("DELETE /api/friends/{id}", authMiddleware(http.HandlerFunc(friendHandler.RemoveFriendHandler)))
-
-	// Health check
-	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `{"status":"ok","service":"habit-tracker"}`)
-	})
+	router.SetupRoutes(mux)
 
 	server := &http.Server{
 		Addr:         ":" + serverPort,
@@ -119,15 +107,7 @@ func main() {
 	}()
 
 	log.Printf("Сервер запускается на порту %s...", serverPort)
-	log.Println("Доступные публичные эндпоинты:")
-	log.Println("  POST /api/register    - регистрация нового пользователя")
-	log.Println("  POST /api/login       - аутентификация пользователя")
-	log.Println("  GET  /health          - проверка здоровья сервиса")
-	log.Println("")
-	log.Println("Защищенные эндпоинты (требуют Bearer токен):")
-	log.Println("  POST   /api/friends           - добавить друга")
-	log.Println("  GET    /api/friends           - получить список друзей")
-	log.Println("  DELETE /api/friends/{id}      - удалить друга")
+	log.Println("Сервер успешно запущен с использованием централизованного роутинга.")
 	log.Println("==========================================")
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

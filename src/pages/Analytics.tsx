@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from 'react'
 import { useHabitStore } from '@/stores/habits'
-import type { Habit } from '@/mocks/types'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 export default function Analytics(){
@@ -12,8 +11,10 @@ export default function Analytics(){
     fetch()
   }, [fetch])
 
-  const selectedHabit = habits.find(h => h.id === selectedHabitId) || habits[0]
-  const data = selectedHabit?.history.map(h => ({date: h.date, value: h.done ? 1 : 0}))
+  // Проверяем, что habits - это массив
+  const habitsArray = Array.isArray(habits) ? habits : []
+  const selectedHabit = habitsArray.find(h => h.id === selectedHabitId) || habitsArray[0]
+  const data = selectedHabit?.history?.map(h => ({date: h.date, value: h.done ? 1 : 0})) || []
 
   return (
     <div className="space-y-6">

@@ -7,8 +7,9 @@ export default function Login() {
   if (typeof document !== 'undefined') {
     document.documentElement.classList.add('dark')
   }
-  const [username, setU] = useState("");
+  const [email, setEmail] = useState(""); // Изменили на email
   const [password, setP] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const login = useAuthStore((s) => s.login);
@@ -17,12 +18,15 @@ export default function Login() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     try {
-      await login(username, password);
+      await login(email, password); // Передаем email вместо username
       navigate("/dashboard");
     } catch (e: any) {
       setError(e.message || "Ошибка входа");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,7 +41,7 @@ export default function Login() {
 
         <div className="text-xs text-white/70 mb-2">
           Тестовые данные:<br />
-          <span className="font-mono">Логин: <b>artur</b> <br/>Пароль: <b>12345</b></span>
+          <span className="font-mono">Email: <b>artur@example.com</b> <br/>Пароль: <b>12345</b></span>
         </div>
 
         {error && (
@@ -47,10 +51,11 @@ export default function Login() {
         )}
 
         <input
-          placeholder="Логин"
-          value={username}
-          onChange={(e) => setU(e.target.value)}
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="bg-white/5 px-3 py-2 rounded-xl w-full text-white outline-none border border-slate-700 focus:ring-2 focus:ring-blue-500 font-sans"
+          disabled={loading}
         />
 
         <input
@@ -59,12 +64,15 @@ export default function Login() {
           value={password}
           onChange={(e) => setP(e.target.value)}
           className="bg-white/5 px-3 py-2 rounded-xl w-full text-white outline-none border border-slate-700 focus:ring-2 focus:ring-blue-500 font-sans"
+          disabled={loading}
         />
 
         <button
-          className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl py-2 text-white font-medium transition font-sans"
+          className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl py-2 text-white font-medium transition font-sans disabled:opacity-50"
+          type="submit"
+          disabled={loading}
         >
-          Войти
+          {loading ? 'Вход...' : 'Войти'}
         </button>
 
         <div className="text-sm text-white/60 text-center font-sans">

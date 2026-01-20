@@ -9,6 +9,7 @@ import (
 type UserRepo interface {
 	CreateUser(ctx context.Context, u *models.User) error
 	GetByEmail(ctx context.Context, email string) (*models.User, error)
+	GetByUsername(ctx context.Context, username string) (*models.User, error)
 	GetByID(ctx context.Context, id int) (*models.User, error)
 	UserExists(ctx context.Context, id int) (bool, error)
 }
@@ -33,6 +34,15 @@ func (r *postgresUserRepo) GetByEmail(ctx context.Context, email string) (*model
 	var u models.User
 	q := `SELECT id, username, email, password FROM users WHERE email = $1`
 	if err := r.db.QueryRowContext(ctx, q, email).Scan(&u.ID, &u.Username, &u.Email, &u.Password); err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
+func (r *postgresUserRepo) GetByUsername(ctx context.Context, username string) (*models.User, error) {
+	var u models.User
+	q := `SELECT id, username, email, password FROM users WHERE username = $1`
+	if err := r.db.QueryRowContext(ctx, q, username).Scan(&u.ID, &u.Username, &u.Email, &u.Password); err != nil {
 		return nil, err
 	}
 	return &u, nil

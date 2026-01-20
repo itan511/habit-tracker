@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"habit-tracker/internal/api/middleware"
 	"habit-tracker/internal/models"
 	"habit-tracker/internal/services"
 	"net/http"
@@ -66,4 +67,28 @@ func (h *UserHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(resp)
+}
+
+func (h *UserHandler) GetMeHandler(w http.ResponseWriter, r *http.Request) {
+	email, ok := middleware.GetUserEmail(r.Context())
+	if !ok {
+		http.Error(w, "not authenticated", http.StatusUnauthorized)
+		return
+	}
+
+	user, err := h.Svc.GetByEmail(r.Context(), email)
+	if err != nil {
+		http.Error(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	response := models.PublicUser{
+		ID:        user.ID,
+		Username:  user.Username,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }

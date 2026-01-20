@@ -1,14 +1,23 @@
-version: '3.8'
-
 services:
 
-  app:
-    build: .
-    container_name: habit-tracker-app
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: habit-tracker-frontend
     ports:
-      - "8080:8080" 
+      - "80:80"
     depends_on:
-      - db 
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: habit-tracker-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -31,7 +40,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432" 
+      - "5433:5432"  # Changed from 5432 to 5433 to avoid conflicts
     restart: unless-stopped
 
 volumes:

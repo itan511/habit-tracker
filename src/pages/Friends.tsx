@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { api } from "@/mocks/api";
-import type { User, Habit } from "@/mocks/types";
+import { friendsApi } from "@/services/friendsApi";
+import { habitsApi } from "@/services/habitsApi";
+import type { User } from "@/services/friendsApi";
+import type { Habit } from "@/services/habitsApi";
 import HabitCard from "@/components/HabitCard";
 import { Link } from 'react-router-dom';
 
@@ -10,19 +12,37 @@ export default function Friends() {
   const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
   const [tag, setTag] = useState("");
   const [loading, setLoading] = useState<Record<number, boolean>>({});
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // грузим моковых друзей
-    api.getFriends().then(setFriends);
+    loadFriends();
   }, []);
+
+  async function loadFriends() {
+    try {
+      const data = await friendsApi.getAll();
+      // Убедимся, что data - это массив
+      const friendsData = Array.isArray(data) ? data : [];
+      setFriends(friendsData);
+    } catch (err: any) {
+      setError(err.message || "Ошибка загрузки друзей");
+    }
+  }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     if (!tag.trim()) return;
 
-    const newFriend = await api.addFriend(tag.trim());
-    setFriends([...friends, newFriend]);
-    setTag("");
+    try {
+      // В реальной системе мы бы добавляли друга по username
+      // Но для простоты будем искать пользователя по username и добавлять его
+      // Пока просто обновим список друзей
+      await friendsApi.add(tag.trim());
+      loadFriends(); // Перезагружаем список друзей
+      setTag("");
+    } catch (err: any) {
+      setError(err.message || "Ошибка добавления друга");
+    }
   }
 
   const loadFriendHabits = async (userId: number) => {
@@ -34,11 +54,16 @@ export default function Friends() {
 
     // Устанавливаем состояние загрузки
     setLoading(prev => ({ ...prev, [userId]: true }));
+    setError(null);
 
     try {
-      const habits = await api.getUserHabits(userId);
-      setFriendHabits(prev => ({ ...prev, [userId]: habits }));
+      const habits = await friendsApi.getUserHabits(userId);
+      // Убедимся, что habits - это массив
+      const habitsData = Array.isArray(habits) ? habits : [];
+      setFriendHabits(prev => ({ ...prev, [userId]: habitsData }));
       setSelectedFriendId(userId);
+    } catch (err: any) {
+      setError(err.message || "Ошибка загрузки привычек друга");
     } finally {
       setLoading(prev => ({ ...prev, [userId]: false }));
     }
@@ -52,6 +77,12 @@ export default function Friends() {
       <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
         Друзья
       </h1>
+
+      {error && (
+        <div className="text-red-400 text-sm p-2 bg-red-900/30 rounded-xl">
+          {error}
+        </div>
+      )}
 
       {/* Форма: на маленьких экранах в столбик, на больших — в ряд */}
       <form
@@ -86,6 +117,14 @@ export default function Friends() {
                     ? 'ring-2 ring-blue-500/50'
                     : 'hover:bg-[var(--card-hover)]'
                 }`}
+                onClick={(e) => {
+                  if (selectedFriendId === f.id) {
+                    e.preventDefault();
+                    setSelectedFriendId(null);
+                  } else {
+                    loadFriendHabits(f.id);
+                  }
+                }}
               >
                 <div className="font-semibold text-[var(--text)]">{f.username}</div>
                 <div className="text-sm text-[var(--text-muted)]">@{f.username}</div>
