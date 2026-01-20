@@ -94,3 +94,14 @@ coverage/
 # Distribution directory
 dist/
 build/
+
+# Node.js
+package-lock.json
+node_modules/
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Generated binaries
+main
